@@ -16,8 +16,8 @@ with st.container():
     col1, col2 = st.columns([5, 2])
 
     with col1:
-        st.subheader("CDF Plot")
-        selected_freq = st.multiselect("Choose Frequencies (Hz):", freq, default=freq)
+        st.subheader("Fmax vs Yield")
+        selected_freq = st.multiselect("Choose Frequencies (MHz):", freq, default=freq)
 
         fig_cdf = go.Figure()
 
@@ -29,8 +29,8 @@ with st.container():
                     x=vmin_values,
                     y=cdf,
                     mode='lines+markers',
-                    name=f'{f} Hz',
-                    hovertemplate='vmin: %{x:.3f}<br>CDF: %{y:.2f}%<extra>%{fullData.name}</extra>'
+                    name=f'{f} MHz',
+                    hovertemplate='Vmin: %{x:.3f}<br>yield: %{y:.2f}%<extra>%{fullData.name}</extra>'
                 ))
 
         fig_cdf.update_layout(
@@ -54,14 +54,15 @@ with st.container():
         freqmin= min(freq)
         v_min_mean=[]
         for i in range(11):
-            v_min_mean.append( df.iloc[:, i + 1].mean())
+            if df.iloc[:, i + 1].mean() != 1.30:
+              v_min_mean.append( df.iloc[:, i + 1][df.iloc[:, i + 1]!=1.3].mean())
         v_min_mean=min(v_min_mean)
 
         for i, f in enumerate(freq):
-            if i== 0:
+            if i== 0 or df.iloc[:, i + 1].mean()==1.3:
                 continue
             if i < df.shape[1] - 1:
-                column = df.iloc[:, i + 1]
+                column = df.iloc[:, i + 1][df.iloc[:, i + 1]!=1.3]
                 avg_mv = column.mean() -v_min_mean
                 mv_mhz =  (f - freqmin) /(avg_mv * 1000) 
                 mv_per_mhz.append(mv_mhz)
@@ -83,7 +84,7 @@ with st.container():
 
         fig_mv_mhz.update_layout(
             title='mV/MHz',
-            xaxis_title='Frequency (Hz)',
+            xaxis_title='Frequency (MHz)',
             yaxis_title='mV/MHz',
             xaxis=dict(tickmode='array', tickvals=tick_vals),
             template='plotly_white',
