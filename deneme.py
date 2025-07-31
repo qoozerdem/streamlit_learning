@@ -24,7 +24,7 @@ with st.container():
         for i, f in enumerate(freq):
             if f in selected_freq and i < df.shape[1] - 1:
                 column = df.iloc[:, i + 1]
-                cdf = [(column <= vmin).sum() / len(column) * 100 for vmin in vmin_values]
+                cdf = [(column[column!=1.3] <= vmin).sum() / len(column) * 100 for vmin in vmin_values]
                 fig_cdf.add_trace(go.Scatter(
                     x=vmin_values,
                     y=cdf,
@@ -107,7 +107,7 @@ with st.container():
             if f in selected_freq and i < df.shape[1] - 1:
                 column = df.iloc[:, i + 1]
                 cutoff = threshold - adder
-                yield_percent = (column <= cutoff).sum() / len(column) * 100
+                yield_percent = (column[column!=1.3] <= cutoff).sum() / len(column) * 100
                 yields.append(yield_percent)
                 freq_yield_data.append((f, yield_percent))  # <-- Save per-frequency
 
