@@ -13,7 +13,7 @@ st.set_page_config(layout="wide")
 
 # ========================= CDF Plot Section =========================
 with st.container():
-    col1, col2 = st.columns([5, 2])
+    col1, col2 = st.columns([2, 1])
 
     with col1:
         st.subheader("Fmax vs Yield")
@@ -34,7 +34,6 @@ with st.container():
                 ))
 
         fig_cdf.update_layout(
-            title='CDF',
             xaxis_title='vmin',
             yaxis_title='CDF (%)',
             xaxis=dict(range=[0.8, 1.3]),
@@ -55,16 +54,16 @@ with st.container():
         v_min_mean=[]
         for i in range(11):
             if df.iloc[:, i + 1].mean() != 1.30:
-              v_min_mean.append( df.iloc[:, i + 1][df.iloc[:, i + 1]!=1.3].mean())
+                v_min_mean.append(df.iloc[:, i + 1][df.iloc[:, i + 1]!=1.3].mean())
         v_min_mean=min(v_min_mean)
 
         for i, f in enumerate(freq):
-            if i== 0 or df.iloc[:, i + 1].mean()==1.3:
+            if i == 0 or df.iloc[:, i + 1].mean() == 1.3:
                 continue
             if i < df.shape[1] - 1:
                 column = df.iloc[:, i + 1][df.iloc[:, i + 1]!=1.3]
-                avg_mv = column.mean() -v_min_mean
-                mv_mhz =  (f - freqmin) /(avg_mv * 1000) 
+                avg_mv = column.mean() - v_min_mean
+                mv_mhz = (f - freqmin) / (avg_mv * 1000) 
                 mv_per_mhz.append(mv_mhz)
                 valid_freq.append(f)
 
@@ -92,31 +91,55 @@ with st.container():
 
         st.plotly_chart(fig_mv_mhz, use_container_width=True)
 
- 
-
-# Threshold and Adder Sliders (smaller font and tighter layout)
-        gaugecol1, gaugecol2 = st.columns([1, 3])
+        # Threshold and Adder Sliders (smaller font and tighter layout)
+        yields = []
+        freq_yield_data = []  # <-- New: to store (frequency, yield) tuples
+                
+        gaugecol1, gaugecol2,gaugecol3 = st.columns([1,2,3])
         with gaugecol1:
         
-             threshold = st.slider("Threshold Value", min_value=0.8, max_value=1.3, value=1.0, step=0.001,key="threshold_slider",width=100)
+             threshold = st.slider("Threshold Value", min_value=0.8, max_value=1.3, value=1.08, step=0.001,key="threshold_slider",width=100)
 
-             adder = st.slider( "Adder Value", min_value=0.0, max_value=0.5, value=0.1, step=0.01,key="adder_slider",width=100)
+             adder = st.slider( "Adder Value", min_value=0.0, max_value=0.5, value=0.0, step=0.01,key="adder_slider",width=100)
         with gaugecol2:
-# Gauge Chart Calculation
-          yields = []
-          for i, f in enumerate(freq):
+
+         for i, f in enumerate(freq):
             if f in selected_freq and i < df.shape[1] - 1:
-              column = df.iloc[:, i + 1]
-              cutoff = threshold - adder
-              yield_percent = (column <= cutoff).sum() / len(column) * 100
-              yields.append(yield_percent)
+                column = df.iloc[:, i + 1]
+                cutoff = threshold - adder
+                yield_percent = (column <= cutoff).sum() / len(column) * 100
+                yields.append(yield_percent)
+                freq_yield_data.append((f, yield_percent))  # <-- Save per-frequency
 
-          average_yield = np.mean(yields) if yields else 0
+         average_yield = np.mean(yields) if yields else 0
 
-        # Smaller Gauge Chart
-          fig_gauge = go.Figure(go.Indicator(mode="gauge+number",value=average_yield,title={'text': "Average Yield (%)", 'font': {'size': 18}},gauge={'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "darkgray"},'bar': {'color': "darkblue"},'steps': [{'range': [0, 50], 'color': "red"},{'range': [50, 80], 'color': "yellow"},{'range': [80, 100], 'color': "green"}],},domain={'x': [0, 1], 'y': [0, 1]}))
+        # ------ Yield per Frequency Table ------
+         if freq_yield_data:
+            df_yield = pd.DataFrame(freq_yield_data, columns=["Frequency (MHz)", "Yield (%)"])
+            df_yield["Frequency (MHz)"] = df_yield["Frequency (MHz)"].map('{:.1f}'.format)
+            df_yield["Yield (%)"] = df_yield["Yield (%)"].map('{:.2f}'.format)
 
-          fig_gauge.update_layout(margin=dict(t=30, b=10),height=350 )
+            st.table(df_yield)
+         else:
+            st.info("No frequency selected for yield calculation.")
+        with gaugecol3:
+         
 
-          st.plotly_chart(fig_gauge, use_container_width=True)
-
+        # ------ Yield Gauge (keep your code as-is) ------
+         fig_gauge = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=average_yield,
+            title={'text': "Average Yield (%)", 'font': {'size': 18}},
+            gauge={
+                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "darkgray"},
+                'bar': {'color': "darkblue"},
+                'steps': [
+                    {'range': [0, 50], 'color': "red"},
+                    {'range': [50, 80], 'color': "yellow"},
+                    {'range': [80, 100], 'color': "green"},
+                ],
+            },
+            domain={'x': [0, 1], 'y': [0, 1]}
+        ))
+         fig_gauge.update_layout(margin=dict(t=30, b=10), height=350)
+         st.plotly_chart(fig_gauge, use_container_width=True)
