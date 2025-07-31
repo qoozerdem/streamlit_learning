@@ -58,7 +58,7 @@ with st.container():
         v_min_mean=min(v_min_mean)
 
         for i, f in enumerate(freq):
-            if i == 0 or df.iloc[:, i + 1].mean() == 1.3:
+            if i == 0 or df.iloc[:, i + 1].mean() == 1.3 or len(df.iloc[:, i + 1][df.iloc[:, i + 1]!=1.3])<26 :
                 continue
             if i < df.shape[1] - 1:
                 column = df.iloc[:, i + 1][df.iloc[:, i + 1]!=1.3]
