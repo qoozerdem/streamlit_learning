@@ -75,16 +75,16 @@ with st.container():
             x=sorted_freq,
             y=sorted_mv_per_mhz,
             mode='lines+markers',
-            name='mV/MHz',
+            name='MHz per mV',
             line=dict(shape='linear')))
 
         tick_interval = (max(sorted_freq) - min(sorted_freq)) // 10 or 1
         tick_vals = list(np.arange(min(sorted_freq), max(sorted_freq) + tick_interval, tick_interval))
 
         fig_mv_mhz.update_layout(
-            title='mV/MHz',
+            title='MHz per mV',
             xaxis_title='Frequency (MHz)',
-            yaxis_title='mV/MHz',
+            yaxis_title='MHz/mV',
             xaxis=dict(tickmode='array', tickvals=tick_vals),
             template='plotly_white',
             height=350)
