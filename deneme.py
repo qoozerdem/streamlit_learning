@@ -51,11 +51,19 @@ with st.container():
         mv_per_mhz = []
         valid_freq = []
 
+        freqmin= min(freq)
+        v_min_mean=[]
+        for i in range(11):
+            v_min_mean.append( df.iloc[:, i + 1].mean())
+        v_min_mean=min(v_min_mean)
+
         for i, f in enumerate(freq):
+            if i== 0:
+                continue
             if i < df.shape[1] - 1:
                 column = df.iloc[:, i + 1]
-                avg_mv = column.mean() - column.min()
-                mv_mhz = (avg_mv * 1000) / (f - 4435.2) if f != 4435.2 else 0
+                avg_mv = column.mean() -v_min_mean
+                mv_mhz =  (f - freqmin) /(avg_mv * 1000) 
                 mv_per_mhz.append(mv_mhz)
                 valid_freq.append(f)
 
