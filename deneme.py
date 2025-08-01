@@ -76,7 +76,7 @@ with st.container():
         yields = []
         freq_yield_data = []  # <-- New: to store (frequency, yield) tuples
 
-        gaugecol1, gaugecol2 = st.columns([55, 100])
+        gaugecol1, gaugecol2 = st.columns([60, 100])
         with gaugecol1:
             threshold = st.slider(
                 "Threshold Value",
