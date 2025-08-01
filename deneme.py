@@ -37,7 +37,7 @@ with st.container():
             xaxis_title='vmin',
             yaxis_title='CDF (%)',
             xaxis=dict(range=[0.8, 1.3]),
-            yaxis=dict(range=[0, 100]),
+            yaxis=dict(range=[0, 110]),
             legend_title='Frequency',
             template='plotly_white',
             height=600,
