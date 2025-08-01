@@ -16,40 +16,9 @@ st.set_page_config(layout="wide")
 with st.container():
     col1, col2 = st.columns([2, 1])
 
-    with col1:
-        st.subheader("Fmax vs Yield")
-        selected_freq = st.multiselect("Choose Frequencies (MHz):", freq, default=freq)
 
-        fig_cdf = go.Figure()
 
-        for i, f in enumerate(freq):
-            if f in selected_freq and i < df.shape[1] - 1:
-                column = df.iloc[:, i + 1]
-                cdf = [
-                    (column[column != 1.3] <= vmin).sum() / len(column) * 100
-                    for vmin in vmin_values
-                ]
-                fig_cdf.add_trace(
-                    go.Scatter(
-                        x=vmin_values,
-                        y=cdf,
-                        mode='lines+markers',
-                        name=f'{f} MHz',
-                        hovertemplate='Vmin: %{x:.3f}<br>yield: %{y:.2f}%<extra>%{fullData.name}</extra>'
-                    )
-                )
 
-        fig_cdf.update_layout(
-            xaxis_title='vmin',
-            yaxis_title='CDF (%)',
-            xaxis=dict(range=[0.8, 1.3]),
-            yaxis=dict(range=[0, 110]),
-            legend_title='Frequency',
-            template='plotly_white',
-            height=600,
-            hovermode='x unified',
-        )
-        st.plotly_chart(fig_cdf, use_container_width=True)
 
     with col2:
         mv_per_mhz = []
@@ -206,3 +175,38 @@ with st.container():
             )
             fig_gauge.update_layout(margin=dict(t=30, b=10), height=350)
             st.plotly_chart(fig_gauge, use_container_width=True)
+    with col1:
+        st.subheader("Fmax vs Yield")
+        selected_freq = st.multiselect("Choose Frequencies (MHz):", freq, default=freq)
+
+        fig_cdf = go.Figure()
+
+        for i, f in enumerate(freq):
+            if f in selected_freq and i < df.shape[1] - 1:
+                column = df.iloc[:, i + 1]
+                cdf = [
+                    (column[column != 1.3] <= vmin-adder).sum() / len(column) * 100
+                    for vmin in vmin_values
+                ]
+                fig_cdf.add_trace(
+                    go.Scatter(
+                        x=vmin_values,
+                        y=cdf,
+                        mode='lines+markers',
+                        name=f'{f} MHz',
+                        hovertemplate='Vmin: %{x:.3f}<br>yield: %{y:.2f}%<extra>%{fullData.name}</extra>'
+                    )
+                )
+
+        fig_cdf.update_layout(
+            xaxis_title='vmin',
+            yaxis_title='CDF (%)',
+            xaxis=dict(range=[0.8, 1.3]),
+            yaxis=dict(range=[0, 110]),
+            legend_title='Frequency',
+            template='plotly_white',
+            height=600,
+            hovermode='x unified',
+        )
+        st.plotly_chart(fig_cdf, use_container_width=True)
+
