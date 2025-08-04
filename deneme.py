@@ -3,23 +3,8 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 
-# ========================= Custom CSS for Compact Controls =========================
-st.markdown(
-    """
-    <style>
-    .element-container, .stSlider, .stSelectbox, .stMultiSelect, .stDataFrame, .stTable {
-        margin-top: 0rem !important;
-        margin-bottom: 0rem !important;
-        padding-top: 0rem !important;
-        padding-bottom: 0rem !important;
-    }
-    .stSlider > div { padding-top: 0rem !important; }
-    .stPlotlyChart { margin-top: 0rem !important; }
-    .stDataFrame { margin-bottom: 0rem !important; }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+
+
 
 # ========================= Load Data =========================
 df = pd.read_csv('output.csv')
@@ -88,7 +73,7 @@ with st.container():
                         domain={'x': [0, 1], 'y': [0, 1]}
                     )
                 )
-                fig_gauge.update_layout(margin=dict(t=10, b=0), height=200)
+                fig_gauge.update_layout(margin=dict(t=10, b=0), height=300)
                 st.plotly_chart(fig_gauge, use_container_width=True)
 
         st.subheader("Fmax vs Yield")
